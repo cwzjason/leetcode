@@ -16,7 +16,7 @@ public class intervalScheduling {
         // end time
         pair[k][1] = input.nextInt();
       }
-
+      // earliest deadline first
       Arrays.sort(pair, (a, b) -> Integer.compare(a[1], b[1]));
       // total intervals
       int count = 0;

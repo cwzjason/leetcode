@@ -14,7 +14,7 @@
 #	rustc source_file.rs
 
 build:
-	javac InverseCounting.java
+	javac Randomization.java
 
 #Run commands to copy:
 #Replace ./HelloWorld below with the appropriate command.
@@ -30,4 +30,4 @@ build:
 #	./source_file
 
 run:
-	java InverseCounting
+	java Randomization

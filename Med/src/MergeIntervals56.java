@@ -3,23 +3,31 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MergeIntervals56 {
-  public int[][] merge(int[][] intervals) {
-    Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
-    // dynamic list instead of fixed size arraylist
-    // result stores arraylists
-    List<int[]> result = new ArrayList<>();
-    // [1,3] [2,4] 2<3 -> [1,4]
-    for (int[] interval : intervals) {
-      // result.get(result.size() - 1)last arraylist, [1]second element
-      // not overlap
-      if (result.isEmpty() || result.get(result.size() - 1)[1] < interval[0]) {
-        result.add(interval);
-      } else {
-        // overlap
-        result.get(result.size() - 1)[1] = Math.max(result.get(result.size() - 1)[1], interval[1]);
+    public int[][] merge(int[][] intervals) {
+      //边界情况
+        if (intervals.length <= 1 || intervals == null) {
+            return intervals;
+        }
+        //先按照第一个值排序
+        Arrays.sort(intervals, (a, b) -> a[0] - b[0]);
+        List<int[]> result = new ArrayList<>();
+        int current[] = intervals[0];
+        //把第一个值左侧区间值加入
+        result.add(current);
+        for (int i = 1; i < intervals.length; i++) {
+            int next[] = intervals[i];
+            //重叠
+            if (current[1] >= next[0]) {
+                current[1] = Math.max(current[1], next[1]);
 
-      }
+            } else {
+              //无重叠
+                current = next;
+                //加右侧区间值
+                result.add(current);
+            }
+        }
+        //转数组
+        return result.toArray(new int[result.size()][]);
     }
-    return result.toArray(new int[result.size()][]);
-  }
 }

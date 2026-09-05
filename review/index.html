@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LeetCode 艾宾浩斯复习 · 云端版</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ==================== 登录页 ==================== -->
+<div id="loginView" class="auth-wrap">
+  <div class="auth-card">
+    <div class="logo-lg">LC</div>
+    <h1>LeetCode 复习 · 云端版</h1>
+    <p class="auth-sub">登录账号，开始今天的复习</p>
+    <form id="loginForm" autocomplete="on">
+      <div class="field">
+        <label for="loginEmail">邮箱</label>
+        <input id="loginEmail" type="email" required placeholder="you@example.com" autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="loginPwd">密码</label>
+        <input id="loginPwd" type="password" required placeholder="请输入密码" autocomplete="current-password">
+      </div>
+      <div id="loginErr" class="err-line"></div>
+      <button type="submit" id="loginBtn" class="btn-login">登录</button>
+    </form>
+    <p class="auth-note">
+      还没有账号？在 Supabase 控制台 <code>Authentication → Users → Add user</code>
+      创建你的登录账号（详见 README.md）。
+    </p>
+  </div>
+</div>
+
+<!-- ==================== 主界面 ==================== -->
+<div id="appView" hidden>
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand">
+      <div class="logo">LC</div>
+      <div>
+        <h1>LeetCode 复习</h1>
+        <p class="sub" id="todayLabel">…</p>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="stats" id="stats"></div>
+      <button id="logoutBtn" class="btn-logout" title="退出登录">退出</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="panel due">
+    <div class="panel-head">
+      <h2>今天要做</h2>
+      <span class="hint" id="dueHint"></span>
+    </div>
+    <div id="dueList" class="card-grid"></div>
+  </section>
+
+  <section class="panel done">
+    <div class="panel-head">
+      <h2>今天已完成</h2>
+      <span class="hint" id="doneHint"></span>
+    </div>
+    <div id="doneList" class="done-list"></div>
+  </section>
+
+  <div class="cols">
+    <section class="panel future">
+      <div class="panel-head"><h2>未来 3 天预告</h2></div>
+      <div id="futureList"></div>
+    </section>
+
+    <section class="panel progress">
+      <div class="panel-head"><h2>全部题目进度</h2></div>
+      <div id="progressList" class="prog-list"></div>
+    </section>
+  </div>
+
+  <section class="panel register">
+    <div class="panel-head"><h2>登记 / 新题</h2></div>
+    <p class="hint">做了一道还没进系统的题？直接输入题号（如 <code>977</code>）或题目名回车即可加入排期；新题会自动弹出补全信息的小窗。</p>
+    <form id="regForm" autocomplete="off">
+      <input id="regInput" type="text" placeholder="例如：977　或　TwoSum1" spellcheck="false">
+      <button type="submit">完成 / 加入复习</button>
+    </form>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <span>数据保存在 Supabase 云端 · 任何设备登录即可同步</span>
+  <span id="footError"></span>
+</footer>
+</div>
+
+<!-- ==================== 新题补全弹窗 ==================== -->
+<div id="modal" class="overlay">
+  <div class="modal">
+    <h3>加入一道新题</h3>
+    <p class="modal-sub">这套题还没进系统，补一下信息就开始排期（今天算作新学，明天起进入复习）。</p>
+    <form id="addForm" autocomplete="off">
+      <div class="field">
+        <label for="newKey">题号（可选，建议填便于以后输入）</label>
+        <input id="newKey" type="text" placeholder="如 1 / 977">
+      </div>
+      <div class="field">
+        <label for="newName">题目名 *</label>
+        <input id="newName" type="text" required placeholder="如 TwoSum1" spellcheck="false">
+      </div>
+      <div class="field">
+        <label for="newLevel">难度</label>
+        <select id="newLevel">
+          <option value="easy">easy</option>
+          <option value="medium" selected>medium</option>
+          <option value="hard">hard</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="addCancel" class="btn btn-ghost">取消</button>
+        <button type="submit" class="btn btn-main auto">加入复习计划</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="config.js"></script>
+<script src="vendor/supabase.umd.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

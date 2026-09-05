@@ -89,6 +89,10 @@ function levelClass(lv) {
   if (m.includes("hard") || m.includes("难")) return "hard";
   return "q";
 }
+function titleOf(p) {
+  const id = (p && p.id) ? String(p.id) : "";
+  return (id ? id + ". " : "") + (p && p.name ? p.name : "");
+}
 
 /* ---------------- 数据与状态 ---------------- */
 let PROBLEMS = [];                       // 云端 problems 表全部行
@@ -111,7 +115,7 @@ function buildData() {
   const active = PROBLEMS.filter(p => !p.completed);
   for (const p of PROBLEMS) {
     const row = {
-      key: p.key, name: p.name, level: p.level || "?",
+      key: p.key, id: p.id, name: p.name, level: p.level || "?",
       stage: p.stage, total: INTERVAL.length,
       completed: p.completed, next_review: p.next_review,
       last_done: p.last_done, completed_date: p.completed_date,
@@ -132,7 +136,7 @@ function buildData() {
     const d = addDaysISO(date, off);
     const items = [];
     for (const p of PROBLEMS) {
-      if (!p.completed && p.next_review === d) items.push({ name: p.name, round: p.stage + 1 });
+      if (!p.completed && p.next_review === d) items.push({ id: p.id, name: p.name, round: p.stage + 1 });
     }
     future.push({ date: d, items: items });
   }
@@ -173,7 +177,7 @@ function renderDue() {
       (p.late ? '<span class="late-chip">已顺延 ' + p.late + " 天</span>" : "");
     return (
       '<div class="task" id="due-' + esc(p.key) + '">' +
-        '<div class="row1"><span class="name">' + esc(p.name) + "</span>" +
+        '<div class="row1"><span class="name">' + esc(titleOf(p)) + "</span>" +
           '<span class="level ' + levelClass(p.level) + '">' + esc(p.level) + "</span></div>" +
         '<div class="row1"><div class="meta">' + chips + "</div></div>" +
         '<button class="btn btn-main" data-act="complete" data-key="' + esc(p.key) + '">' +
@@ -196,7 +200,7 @@ function renderDone() {
     return (
       '<div class="done-item"><div class="l">' +
         '<span class="tick">&#10003;</span>' +
-        '<span class="name">' + esc(p.name) + "</span>" +
+        '<span class="name">' + esc(titleOf(p)) + "</span>" +
         '<span class="done-chip">' + doneTxt + "</span></div>" +
         '<button class="btn btn-ghost" data-act="undo" data-key="' + esc(p.key) + '">撤销</button>' +
       "</div>"
@@ -215,7 +219,7 @@ function renderFuture() {
     if (!f.items.length) return "";
     return (
       '<div class="future-line"><span class="d">' + shortDate(f.date) + "</span>" +
-      '<span class="n">' + f.items.map(i => esc(i.name) + "（第" + i.round + "轮）").join("、") + "</span></div>"
+      '<span class="n">' + f.items.map(i => esc(titleOf(i)) + "（第" + i.round + "轮）").join("、") + "</span></div>"
     );
   }).join("");
 }
@@ -229,7 +233,7 @@ function renderProgress() {
   }
   box.innerHTML = ps.map(p => {
     let statusHtml, dotsHtml = "";
-    const total = p.total;
+    const total = p.total || INTERVAL.length;
     let on = 0, isFin = false, nextIdx = -1;
     if (p.completed) {
       on = total;
@@ -252,7 +256,7 @@ function renderProgress() {
     }
     return (
       '<div class="prog-item">' +
-        '<div class="row"><span class="name">' + esc(p.name) + "</span>" +
+        '<div class="row"><span class="name">' + esc(titleOf(p)) + "</span>" +
           '<span class="level ' + levelClass(p.level) + '">' + esc(p.level) + "</span>" +
           statusHtml + "</div>" +
         (p.completed ? "" : '<div class="meta" style="margin-top:2px;color:var(--muted);font-size:12px">' +

@@ -10,8 +10,12 @@ review/
 ├── app.js               逻辑（读 Supabase、排期计算、完成/撤销/新题）
 ├── config.js            ★ 唯一需要填配置的地方（Supabase 地址 + anon key）
 ├── vercel.json          Vercel 静态站配置
-├── vendor/              本地化的 Supabase 客户端库（无需 CDN）
 └── supabase/schema.sql  建表脚本（第一次在 Supabase 里执行一次）
+
+> 说明：Supabase 的客户端库不放进仓库。浏览器打开网页时，
+> 会自动从 CDN（unpkg）加载它再连接数据库，所以代码里干干净净。
+> 如果某天 CDN 访问异常，把 `app.js` 顶部的 `SUPABASE_CDN` 换成
+> `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js` 即可。
 ```
 
 ## 使用流程（按顺序）

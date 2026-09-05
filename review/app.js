@@ -8,9 +8,33 @@
  * ================================================================= */
 
 const CFG = window.APP_CONFIG || {};
-const SB = (window.supabase && CFG.supabaseUrl && !CFG.supabaseUrl.includes("YOUR-"))
-  ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey)
-  : null;
+let SB = null;
+const SUPABASE_CDN = "https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js";
+
+function loadSupabaseLib() {
+  return new Promise((resolve, reject) => {
+    if (window.supabase && typeof window.supabase.createClient === "function") return resolve();
+    const s = document.createElement("script");
+    s.src = SUPABASE_CDN;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error("Supabase 客户端库加载失败：浏览器访问不到 " + SUPABASE_CDN));
+    document.head.appendChild(s);
+  });
+}
+
+// 客户端库不需要提前下载/打包：打开网页时浏览器自动从 CDN 加载，
+// 加载成功后才能连接 Supabase（这一步在登录页阶段完成）。
+function ensureClient() {
+  if (SB) return Promise.resolve(SB);
+  if (!CFG.supabaseUrl || CFG.supabaseUrl.includes("YOUR-") ||
+      !CFG.supabaseAnonKey || CFG.supabaseAnonKey.includes("YOUR-")) {
+    return Promise.reject(new Error("config.js 尚未填入 Supabase 地址与 anon key"));
+  }
+  return loadSupabaseLib().then(() => {
+    SB = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey);
+    return SB;
+  });
+}
 
 /* ---------------- 工具 ---------------- */
 function esc(s) {
@@ -441,13 +465,16 @@ function applySession(s) {
 }
 
 async function initAuth() {
-  if (!SB) {
-    $("#loginErr").textContent = "尚未配置 Supabase：请编辑 config.js 填入项目地址与 anon key";
+  let client;
+  try {
+    client = await ensureClient();
+  } catch (e) {
+    $("#loginErr").textContent = e.message;
     return;
   }
-  const { data } = await SB.auth.getSession();
+  const { data } = await client.auth.getSession();
   applySession(data.session);
-  SB.auth.onAuthStateChange((_event, session) => applySession(session));
+  client.auth.onAuthStateChange((_event, session) => applySession(session));
 }
 
 async function doLogin(email, password, btn) {

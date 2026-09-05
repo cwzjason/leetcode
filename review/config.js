@@ -7,8 +7,8 @@
 //       service_role key 才绝不能出现在网页代码里。
 // ============================================================
 window.APP_CONFIG = {
-  supabaseUrl: "https://YOUR-PROJECT-REF.supabase.co",
-  supabaseAnonKey: "YOUR-ANON-PUBLIC-KEY",
+  supabaseUrl: "https://ccjvijjjhfeaqgmkbd.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjaml2amlqamhmZWFxZ3Fta2JkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1NjMwMTMsImV4cCI6MjEwNDEzOTAxM30.YmJhatll2rUH-9Jcq3Q7k0iKgqNxHQyAU-S3psYCRgs",
   accessCode: "cwz",                 // 打开网页要输入的访问口令，想换就改这里
   interval: [1, 2, 4, 7, 15, 30, 60],   // 艾宾浩斯间隔（天）；首次建库用
 };

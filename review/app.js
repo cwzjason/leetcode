@@ -672,6 +672,16 @@ async function undoKey(key) {
     const date = todayISO();
     const p = PROBLEMS.find(x => x.key === key);
     if (!p) { toast("库中找不到该题", true); return; }
+
+    // 今天新加入的题没有 snapshot（不是完成一轮，而是新增），撤销 = 删除
+    if (!p.snapshot && p.added === date && p.stage === 0 && !p.completed) {
+      const { error } = await SB.from("problems").delete().eq("key", key);
+      if (error) throw error;
+      toast("已删除今天新加入的「" + p.name + "」");
+      await loadData(true);
+      return;
+    }
+
     const snap = p.snapshot;
     if (!snap) { toast("没有可撤销的记录", true); return; }
     if (p.last_done !== date) { toast("只能撤销今天通过网页完成的登记", true); return; }

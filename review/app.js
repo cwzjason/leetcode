@@ -458,7 +458,13 @@ const authView = $("#loginView");
 const appView = $("#appView");
 const LS_KEY = "lc_pass_ok";     // 同一浏览器输过一次口令后记住，下次直接进
 
-function enterApp() {
+async function enterApp() {
+  try {
+    await ensureClient();
+  } catch (e) {
+    $("#loginErr").textContent = e.message;
+    return;
+  }
   authView.hidden = true;
   appView.hidden = false;
   try { localStorage.setItem(LS_KEY, ACCESS_CODE); } catch (e) { /* 隐私模式忽略 */ }
@@ -474,14 +480,14 @@ document.addEventListener("click", (e) => {
   if (act === "undo") onUndoClick(b);
 });
 
-$("#codeForm").addEventListener("submit", (e) => {
+$("#codeForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const code = $("#accessCode").value.trim();
   if (code !== ACCESS_CODE) {
     $("#loginErr").textContent = "口令不对，请重试";
     return;
   }
-  enterApp();
+  await enterApp();
 });
 
 $("#regForm").addEventListener("submit", async (e) => {
@@ -511,7 +517,7 @@ $("#addCancel").addEventListener("click", closeQuickAdd);
   if (saved === ACCESS_CODE) {
     try {
       await ensureClient();
-      enterApp();
+      await enterApp();
       return;
     } catch (e) {
       $("#loginErr").textContent = e.message;

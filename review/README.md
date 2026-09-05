@@ -4,13 +4,14 @@
 电脑不用开机、任何设备登录即可访问；排期算法与原来完全一致。
 
 ```
-review/
-├── index.html           页面（登录 + 复习面板）
-├── style.css            样式
-├── app.js               逻辑（读 Supabase、排期计算、完成/撤销/新题）
-├── config.js            ★ 唯一需要填配置的地方（Supabase 地址 + anon key）
-├── vercel.json          Vercel 静态站配置
-└── supabase/schema.sql  建表脚本（第一次在 Supabase 里执行一次）
+仓库根（cwzjason/leetcode）
+├── vercel.json          部署配置：静态输出目录指向 review
+└── review/              网页代码
+    ├── index.html           页面（登录 + 复习面板）
+    ├── style.css            样式
+    ├── app.js               逻辑（读 Supabase、排期计算、完成/撤销/新题）
+    ├── config.js            ★ 唯一需要填配置的地方（Supabase 地址 + anon key）
+    └── supabase/schema.sql  建表脚本（第一次在 Supabase 里执行一次）
 
 > 说明：Supabase 的客户端库不放进仓库。浏览器打开网页时，
 > 会自动从 CDN（unpkg）加载它再连接数据库，所以代码里干干净净。
@@ -23,7 +24,7 @@ review/
 ### 1. Vercel 部署
 1. 打开 [vercel.com](https://vercel.com) → 用 GitHub 登录 → **Add New Project**；
 2. Import 仓库 `cwzjason/leetcode`；
-3. Framework Preset 选 **Other**；**Root Directory 填 `review`**；
+3. Framework Preset 选 **Other**；Root Directory 保持默认（仓库根 `vercel.json` 已把输出目录指向 `review`）；
 4. 直接 **Deploy**。部署成功后得到一个网址，如 `https://leetcode-xxx.vercel.app`。
 
 ### 2. Supabase 建库

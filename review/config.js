@@ -9,5 +9,6 @@
 window.APP_CONFIG = {
   supabaseUrl: "https://YOUR-PROJECT-REF.supabase.co",
   supabaseAnonKey: "YOUR-ANON-PUBLIC-KEY",
+  accessCode: "cwz",                 // 打开网页要输入的访问口令，想换就改这里
   interval: [1, 2, 4, 7, 15, 30, 60],   // 艾宾浩斯间隔（天）；首次建库用
 };

@@ -8,27 +8,23 @@
 </head>
 <body>
 
-<!-- ==================== 登录页 ==================== -->
+<!-- ==================== 访问口令页 ==================== -->
 <div id="loginView" class="auth-wrap">
   <div class="auth-card">
     <div class="logo-lg">LC</div>
     <h1>LeetCode 复习 · 云端版</h1>
-    <p class="auth-sub">登录账号，开始今天的复习</p>
-    <form id="loginForm" autocomplete="on">
+    <p class="auth-sub">输入访问口令，开始今天的复习</p>
+    <form id="codeForm" autocomplete="off">
       <div class="field">
-        <label for="loginEmail">邮箱</label>
-        <input id="loginEmail" type="email" required placeholder="you@example.com" autocomplete="username">
-      </div>
-      <div class="field">
-        <label for="loginPwd">密码</label>
-        <input id="loginPwd" type="password" required placeholder="请输入密码" autocomplete="current-password">
+        <label for="accessCode">访问口令</label>
+        <input id="accessCode" type="password" required placeholder="请输入访问口令" autocomplete="off">
       </div>
       <div id="loginErr" class="err-line"></div>
-      <button type="submit" id="loginBtn" class="btn-login">登录</button>
+      <button type="submit" id="codeBtn" class="btn-login">进入</button>
     </form>
     <p class="auth-note">
-      还没有账号？在 Supabase 控制台 <code>Authentication → Users → Add user</code>
-      创建你的登录账号（详见 README.md）。
+      这是个人复习工具，口令用于挡住陌生人。想换口令：
+      <code>config.js → accessCode</code>
     </p>
   </div>
 </div>
@@ -46,7 +42,6 @@
     </div>
     <div class="top-right">
       <div class="stats" id="stats"></div>
-      <button id="logoutBtn" class="btn-logout" title="退出登录">退出</button>
     </div>
   </div>
 </header>
@@ -92,7 +87,7 @@
 </main>
 
 <footer class="wrap foot">
-  <span>数据保存在 Supabase 云端 · 任何设备登录即可同步</span>
+  <span>数据保存在 Supabase 云端 · 输入访问口令即可使用</span>
   <span id="footError"></span>
 </footer>
 </div>

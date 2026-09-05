@@ -5,9 +5,12 @@
  * 数据存 Supabase；排期算法与本地版完全一致：
  *   点「完成」→ 轮次 +1 → 按 interval 计算下次复习日期；
  *   攒满 7 轮 → 通关归档。页面每次打开实时计算「今天要做」。
+ * 访问方式：打开网页输入访问口令（config.js 的 accessCode）即可进入，
+ *           不需要邮箱账号。
  * ================================================================= */
 
 const CFG = window.APP_CONFIG || {};
+const ACCESS_CODE = (CFG.accessCode || "cwz");   // 打开网页需输入的访问口令（config.js 可改）
 let SB = null;
 const SUPABASE_CDN = "https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js";
 
@@ -23,7 +26,7 @@ function loadSupabaseLib() {
 }
 
 // 客户端库不需要提前下载/打包：打开网页时浏览器自动从 CDN 加载，
-// 加载成功后才能连接 Supabase（这一步在登录页阶段完成）。
+// 加载成功后才能连接 Supabase（进入页面之前完成）。
 function ensureClient() {
   if (SB) return Promise.resolve(SB);
   if (!CFG.supabaseUrl || CFG.supabaseUrl.includes("YOUR-") ||
@@ -104,7 +107,8 @@ async function ensureMeta() {
 
 function buildData() {
   const date = todayISO();
-  const due = [], doneToday = [], active = [], done = [];
+  const due = [], doneToday = [], done = [];
+  const active = PROBLEMS.filter(p => !p.completed);
   for (const p of PROBLEMS) {
     const row = {
       key: p.key, name: p.name, level: p.level || "?",
@@ -133,10 +137,6 @@ function buildData() {
     future.push({ date: d, items: items });
   }
 
-  active.sort((a, b) => {
-    const x = a.next_review || "9999", y = b.next_review || "9999";
-    return x === y ? (a.key < b.key ? -1 : 1) : (x < y ? -1 : 1);
-  });
   done.sort((a, b) => {
     const x = a.completed_date || "", y = b.completed_date || "";
     return x === y ? (a.key < b.key ? -1 : 1) : (x < y ? -1 : 1);
@@ -453,46 +453,16 @@ function onUndoClick(btn) {
   btn.classList.add("armed");
 }
 
-/* ---------------- 登录 / 退出 ---------------- */
-const loginView = $("#loginView");
+/* ---------------- 访问口令 ---------------- */
+const authView = $("#loginView");
 const appView = $("#appView");
+const LS_KEY = "lc_pass_ok";     // 同一浏览器输过一次口令后记住，下次直接进
 
-function applySession(s) {
-  const ok = !!s;
-  loginView.hidden = ok;
-  appView.hidden = !ok;
-  if (ok && !DATA) loadData(false);
-}
-
-async function initAuth() {
-  let client;
-  try {
-    client = await ensureClient();
-  } catch (e) {
-    $("#loginErr").textContent = e.message;
-    return;
-  }
-  const { data } = await client.auth.getSession();
-  applySession(data.session);
-  client.auth.onAuthStateChange((_event, session) => applySession(session));
-}
-
-async function doLogin(email, password, btn) {
-  $("#loginErr").textContent = "";
-  btn.disabled = true;
-  btn.textContent = "登录中…";
-  try {
-    const { error } = await SB.auth.signInWithPassword({ email: email, password: password });
-    if (error) {
-      $("#loginErr").textContent = error.message.indexOf("Invalid login") >= 0
-        ? "邮箱或密码不对，请重试"
-        : error.message;
-    }
-  } catch (e) {
-    $("#loginErr").textContent = "登录失败：" + (e.message || e);
-  }
-  btn.disabled = false;
-  btn.textContent = "登录";
+function enterApp() {
+  authView.hidden = true;
+  appView.hidden = false;
+  try { localStorage.setItem(LS_KEY, ACCESS_CODE); } catch (e) { /* 隐私模式忽略 */ }
+  if (!DATA) loadData(false);
 }
 
 /* ---------------- 事件绑定 ---------------- */
@@ -504,12 +474,15 @@ document.addEventListener("click", (e) => {
   if (act === "undo") onUndoClick(b);
 });
 
-$("#loginForm").addEventListener("submit", (e) => {
+$("#codeForm").addEventListener("submit", (e) => {
   e.preventDefault();
-  doLogin($("#loginEmail").value.trim(), $("#loginPwd").value, $("#loginBtn"));
+  const code = $("#accessCode").value.trim();
+  if (code !== ACCESS_CODE) {
+    $("#loginErr").textContent = "口令不对，请重试";
+    return;
+  }
+  enterApp();
 });
-
-$("#logoutBtn").addEventListener("click", () => { SB.auth.signOut(); });
 
 $("#regForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -532,4 +505,21 @@ $("#addForm").addEventListener("submit", (e) => {
 $("#addCancel").addEventListener("click", closeQuickAdd);
 
 /* ---------------- 启动 ---------------- */
-initAuth();
+(async function boot() {
+  let saved = null;
+  try { saved = localStorage.getItem(LS_KEY); } catch (e) { /* 忽略 */ }
+  if (saved === ACCESS_CODE) {
+    try {
+      await ensureClient();
+      enterApp();
+      return;
+    } catch (e) {
+      $("#loginErr").textContent = e.message;
+      return;
+    }
+  }
+  if (!CFG.supabaseUrl || CFG.supabaseUrl.includes("YOUR-") ||
+      !CFG.supabaseAnonKey || CFG.supabaseAnonKey.includes("YOUR-")) {
+    $("#loginErr").textContent = "config.js 尚未填入 Supabase 地址与 anon key（配置好后刷新页面）";
+  }
+})();

@@ -746,6 +746,7 @@ async function submitQuickAdd() {
     if (error) throw error;
     closeQuickAdd();
     toast("新题「" + name + "」已加入复习计划 · 明天进入第一轮");
+    $("#regInput").value = "";          // 清空快速登记输入框
     await loadData(true);
   } catch (e) {
     if (e.code === "23505") toast("该题已存在", true);
@@ -928,7 +929,7 @@ $("#regForm").addEventListener("submit", async (e) => {
   if (!v) return;
   const hit = findProblem(v);
   if (hit) {
-    if (hit.completed) { toast("「" + hit.name + "」已通关，不用再做", true); return; }
+    if (hit.completed) { toast("「" + hit.name + "」已通关，不用再做", true); input.value = ""; return; }
     const r = await completeKey(hit.key, $("#regForm button"));
     if (r && r.ok) input.value = "";
   } else {

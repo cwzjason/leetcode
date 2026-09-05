@@ -104,9 +104,14 @@ function levelClass(lv) {
   return "q";
 }
 function titleOf(p) {
-  const id = (p && p.id != null && p.id !== "") ? String(p.id) : "";
-  if (id && String(p.key || "").indexOf(id) !== 0) return id + ". " + (p.name || "");
-  return (p && p.name) ? p.name : String(p.key || "");
+  if (!p) return "";
+  const name = String(p.name || "");
+  const base = name || String(p.key || "");
+  // 名字本身已带 "27. " 这样的前缀就直接用（避免重复）
+  if (/^\d+\./.test(base)) return base;
+  // 像力扣一样：有题号就在题名前加 "27. "
+  const id = (p.id != null && p.id !== "") ? String(p.id) : "";
+  return id ? id + ". " + base : base;
 }
 function levelSpan(p) {
   const lv = p.level || "?";

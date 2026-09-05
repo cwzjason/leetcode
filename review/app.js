@@ -280,12 +280,14 @@ function taskCard(p, opts) {
   const q = opts.queued;
   const key = esc(p.key);
   const doneT = opts.doneToday;
+  const round = opts.round;                 // 轮次/顺延天数来自排期计算 opts，不在题目行里
+  const late = opts.late;
   const chips =
-    '<span class="round-chip">第 ' + p.round + " 轮复习</span>" +
-    (p.late ? '<span class="late-chip">顺延 ' + p.late + " 天</span>" : "");
+    '<span class="round-chip">第 ' + round + " 轮复习</span>" +
+    (late ? '<span class="late-chip">顺延 ' + late + " 天</span>" : "");
   const btnTxt = opts.doneToday
     ? "今天已完成"
-    : (opts.queued ? "现在就做（第 " + p.round + " 轮）" : "完成第 " + p.round + " 轮复习");
+    : (opts.queued ? "现在就做（第 " + round + " 轮）" : "完成第 " + round + " 轮复习");
   return (
     '<div class="task' + (q ? " task-q" : "") + '" id="due-' + key + '">' +
       '<div class="row1"><span class="name">' + esc(titleOf(p)) + "</span>" +

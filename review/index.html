@@ -47,48 +47,135 @@
   </div>
 </header>
 
+<div class="wrap">
+  <nav class="tabs" id="tabNav">
+    <button class="tab active" data-tab="today">今日任务</button>
+    <button class="tab" data-tab="cal">日历 / 统计</button>
+    <button class="tab" data-tab="lib">题目库</button>
+  </nav>
+</div>
+
 <main class="wrap">
 
-  <section class="panel due">
-    <div class="panel-head">
-      <h2>今天要做</h2>
-      <span class="hint" id="dueHint"></span>
-    </div>
-    <div id="dueList" class="card-grid"></div>
-  </section>
+  <!-- ============ 标签页一：今日任务 ============ -->
+  <section class="pane active" id="tab-today">
 
-  <section class="panel done">
-    <div class="panel-head">
-      <h2>今天已完成</h2>
-      <span class="hint" id="doneHint"></span>
-    </div>
-    <div id="doneList" class="done-list"></div>
-  </section>
+    <section class="panel register">
+      <div class="panel-head"><h2>登记 / 快速完成</h2></div>
+      <p class="hint">输入题号（如 <code>455</code>）或题目名，系统里的题会立即完成一轮复习（含没到期的提前复习、排队中的优先处理）；没进系统的新题会自动弹出补全信息。</p>
+      <form id="regForm" autocomplete="off">
+        <input id="regInput" type="text" placeholder="例如：455　或　TwoCityScheduling1029" spellcheck="false">
+        <button type="submit">做题 / 登记</button>
+      </form>
+    </section>
 
-  <div class="cols">
+    <section class="panel todo" id="todoSection">
+      <div class="panel-head">
+        <h2>今天要做</h2>
+        <span class="hint" id="todoHint"></span>
+      </div>
+      <div id="todoList" class="card-grid"></div>
+    </section>
+
+    <section class="panel queue" id="queueSection" hidden>
+      <div class="panel-head">
+        <h2>排队中 · 已到期未排上</h2>
+        <span class="hint" id="queueHint"></span>
+      </div>
+      <div id="queueList" class="card-grid"></div>
+    </section>
+
+    <section class="panel done">
+      <div class="panel-head">
+        <h2>今天已完成</h2>
+        <span class="hint" id="doneHint"></span>
+      </div>
+      <div id="doneList" class="done-list"></div>
+    </section>
+
     <section class="panel future">
-      <div class="panel-head"><h2>未来 3 天预告</h2></div>
+      <div class="panel-head">
+        <h2>未来 7 天预告（按每天最多 3 道自动排队）</h2>
+        <span class="hint">第 1 道往后是每天自动顺延的结果，想提前做可到「题目库」里点任意题</span>
+      </div>
       <div id="futureList"></div>
     </section>
-
-    <section class="panel progress">
-      <div class="panel-head"><h2>全部题目进度</h2></div>
-      <div id="progressList" class="prog-list"></div>
-    </section>
-  </div>
-
-  <section class="panel register">
-    <div class="panel-head"><h2>登记 / 新题</h2></div>
-    <p class="hint">做了一道还没进系统的题？直接输入题号（如 <code>977</code>）或题目名回车即可加入排期；新题会自动弹出补全信息的小窗。</p>
-    <form id="regForm" autocomplete="off">
-      <input id="regInput" type="text" placeholder="例如：977　或　TwoSum1" spellcheck="false">
-      <button type="submit">完成 / 加入复习</button>
-    </form>
   </section>
+
+  <!-- ============ 标签页二：日历 / 统计 ============ -->
+  <section class="pane" id="tab-cal">
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>复习日历</h2>
+        <span class="hint" id="calHint"></span>
+      </div>
+      <div class="cal-card">
+        <div class="cal-toolbar">
+          <button class="cal-btn" data-act="cal-prev">‹ 上月</button>
+          <div class="cal-title" id="calTitle"></div>
+          <div class="cal-tools">
+            <button class="cal-btn" data-act="cal-today">今天</button>
+            <button class="cal-btn" data-act="cal-next">下月 ›</button>
+          </div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-legend">
+          <span class="lg"><i class="mk mk-do"></i>做了题</span>
+          <span class="lg"><i class="mk mk-plan"></i>有排期</span>
+          <span class="lg"><i class="mk mk-queue"></i>排队中</span>
+        </div>
+        <p class="hint cal-tip">点击任意日期，查看当天的完成记录和计划安排。</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>统计</h2>
+        <div class="period-bar" id="periodBar">
+          <button class="pbtn" data-period="week">本周</button>
+          <button class="pbtn active" data-period="month">本月</button>
+          <button class="pbtn" data-period="year">今年</button>
+          <button class="pbtn" data-period="all">累计</button>
+        </div>
+      </div>
+      <div class="stat-cards" id="statCards"></div>
+      <div class="stat-detail-head" id="statDetailTitle"></div>
+      <div id="statDetail" class="stat-detail"></div>
+    </section>
+  </section>
+
+  <!-- ============ 标签页三：题目库 ============ -->
+  <section class="pane" id="tab-lib">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>全部题目</h2>
+        <span class="hint" id="libHint"></span>
+      </div>
+      <div class="lib-toolbar">
+        <input id="libSearch" type="text" placeholder="搜索题号 / 名字…" spellcheck="false">
+        <select id="libLevel">
+          <option value="">难度：全部</option>
+          <option value="easy">easy</option>
+          <option value="medium">medium</option>
+          <option value="hard">hard</option>
+        </select>
+        <select id="libStatus">
+          <option value="">状态：全部</option>
+          <option value="due">今天要做</option>
+          <option value="queue">排队中</option>
+          <option value="active">进行中</option>
+          <option value="done">已通关</option>
+        </select>
+      </div>
+      <div id="libList" class="lib-list"></div>
+    </section>
+  </section>
+
 </main>
 
 <footer class="wrap foot">
-  <span>数据保存在 Supabase 云端 · 输入访问口令即可使用</span>
+  <span>数据保存在 Supabase 云端 · 每天最多安排 3 道，没做的自动顺延到后面</span>
   <span id="footError"></span>
 </footer>
 </div>
@@ -97,15 +184,15 @@
 <div id="modal" class="overlay">
   <div class="modal">
     <h3>加入一道新题</h3>
-    <p class="modal-sub">这套题还没进系统，补一下信息就开始排期（今天算作新学，明天起进入复习）。</p>
+    <p class="modal-sub">这套题还没进系统，补一下信息就开始排期（今天算作新学，明天起进入复习）。题目名建议填 LeetCode 原题名（如 <code>TwoCityScheduling1029</code>），方便自动打开原题。</p>
     <form id="addForm" autocomplete="off">
       <div class="field">
         <label for="newKey">题号（可选，建议填便于以后输入）</label>
-        <input id="newKey" type="text" placeholder="如 1 / 977">
+        <input id="newKey" type="text" placeholder="如 1029 / 455">
       </div>
       <div class="field">
         <label for="newName">题目名 *</label>
-        <input id="newName" type="text" required placeholder="如 TwoSum1" spellcheck="false">
+        <input id="newName" type="text" required placeholder="如 TwoCityScheduling1029" spellcheck="false">
       </div>
       <div class="field">
         <label for="newLevel">难度</label>
@@ -120,6 +207,17 @@
         <button type="submit" class="btn btn-main auto">加入复习计划</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ==================== 日期详情弹窗 ==================== -->
+<div id="dayModal" class="overlay">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <h3 id="dayTitle"></h3>
+      <button type="button" class="btn btn-ghost" data-act="day-close">关闭</button>
+    </div>
+    <div id="dayBody" class="day-body"></div>
   </div>
 </div>
 
